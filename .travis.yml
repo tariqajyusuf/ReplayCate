@@ -1,0 +1,26 @@
+# Travis CI configuration file for ReplayCate.
+#
+# Bazel + Travis CI integration inspired from http://github.com/korfuri/bazel-travis.
+
+env:
+  - BAZEL_VERSION=0.12.0  # Version of Bazel to use.
+
+dist: trusty  # fixing build environment for bazel
+
+# We use a fixed version from GitHub so that we can manually migrate up to newer
+# versions without breaking tests.
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - wget
+      - pkg-config
+
+before_install:
+  - wget https://github.com/bazelbuild/bazel/releases/download/$(BAZEL_VERSION)/$(BAZEL_VERSION)-linux-x86_64.deb
+  - sha256sum -c tools/bazel_$(BAZEL_VERSION)-linux-x86_64.deb.sha256
+  - sudo dpkg -i bazel_$(BAZEL_VERSION)-linux-x86_64.deb
+
+script:
+  - bazel build :replaycate
